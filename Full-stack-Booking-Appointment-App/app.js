@@ -1,20 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
-const app = express();
 const cors = require('cors');
 
 const sequelize = require('./util/database');
-
-const User = require('./models/User');
-app.use(cors());
-
 const regRoutes = require('./routes/regpage');
+
+const app = express();
+
+app.use(cors());
 
 app.use(bodyParser.json({extended : false}));
 
 app.use('/user',regRoutes);
-
 
 sequelize.sync()
 .then( res =>{

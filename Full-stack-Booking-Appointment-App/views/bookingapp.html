@@ -30,7 +30,7 @@
             try{
                 let pr1 =await axios.get("http://localhost:3000/user/get-user");
                 for(var i =0;i<pr1.data.allUsers.length;i++){
-                    console.log(pr1.data.allUsers[i]);
+                    //console.log(pr1.data.allUsers[i]);
                     showUsers(pr1.data.allUsers[i]);
                 }
             }catch(err){
