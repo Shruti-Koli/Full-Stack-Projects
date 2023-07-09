@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking App</title>
+</head>
+<body>
+    <h1>BOOKING APPOINTMENT APP</h1>
+    <form onsubmit='userDetails(event)' autocomplete="on">
+        <label for="name">Name:</label><br>
+        <input name="name" id="name" autocomplete="on"><br>
+        <label for="phoneno">Phone No.:</label><br>
+        <input type="number" name="phoneno" id="phoneno" autocomplete="on"><br>
+        <label for="email">Email:</label><br>
+        <input type="email" name="email" id="email" autocomplete="on"><br>
+        <button type="submit">Submit</button><br>
+    </form>
+    <hr>
+    <br>
+    <br>
+    <ul id="userList">
+
+    </ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script>
+
+        //load all the existing entries
+        window.addEventListener("DOMContentLoaded",async ()=>{
+            try{
+                let pr1 =await axios.get("http://localhost:3000/user/get-user");
+                for(var i =0;i<pr1.data.allUsers.length;i++){
+                    console.log(pr1.data.allUsers[i]);
+                    showUsers(pr1.data.allUsers[i]);
+                }
+            }catch(err){
+                console.log(err);
+            }
+        })
+
+
+        function userDetails(event){
+            event.preventDefault();
+            const name = event.target.name.value;
+            const phoneno = event.target.phoneno.value;
+            const email = event.target.email.value;
+            const obj={
+                name,phoneno,email
+            };
+            axios.post("http://localhost:3000/user/add-user",obj)
+                .then((response)=>{
+                    console.log(response.data.newUserDetails);
+                    showUsers(response.data.newUserDetails);
+                })
+                .catch((err)=>{
+                    document.body.innerHTML = document.body.innerHTML +'<h4 id="box">Somenthing went wrong</h4>';
+                    setTimeout(() => {
+                        const box = document.getElementById('box');
+                        box.style.display = 'none';}, 2000); 
+                    console.log(err);
+                })
+            event.target.name.value="";
+            event.target.phoneno.value="";
+            event.target.email.value="";
+        }
+
+
+
+    
+  //to display user data on screen
+    function showUsers(user){
+      let ulist = document.getElementById("userList");
+      ulist.innerHTML= ulist.innerHTML +
+      `<li id="${user.id}">Name: ${user.name} Email: ${user.email} Phone:${user.phoneno} <button onclick="editUserDetail('${user.id}','${user.name}','${user.email}','${user.phoneno}')">Edit</button><button onclick="deleteUser('${user.id}','${user.name}','${user.email}','${user.phoneno}')">Delete</button></li>`
+  
+    }
+  
+  
+  //function to delete user from DB
+    async function deleteUser(userid,name,email,number){
+      try{
+        let res= await axios.delete("http://localhost:3000/user/delete-user/"+userid);
+        deleteFromScreen(userid);
+      }catch(err){
+        console.log(err);
+      }
+    }
+  
+    // delete user from screen
+    function deleteFromScreen(userid){
+      let ulist = document.getElementById("userList");
+      let ch = document.getElementById(userid);
+      ulist.removeChild(ch);
+    }
+    //function to edit user
+    function editUserDetail(userId,name,emailid,phonenumber){
+        document.getElementById('name').value=name; 
+        document.getElementById('email').value=emailid;
+        document.getElementById('phoneno').value=phonenumber;
+        deleteFromScreen(userId);
+        edit1 = userId;
+    }
+  
+  </script>
+
+</body>
+</html>
